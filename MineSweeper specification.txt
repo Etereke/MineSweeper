@@ -1,0 +1,15 @@
+Console minesweeper
+
+	-3 difficulties + custom:
+		-Beginner: 9x9, 10 mines
+		-Intermediate: 16x16, 40 mines
+		-Expert: 16x30, 99 mines
+		-Custom: min 9x9, max 24x30; min 10 mines, max 90% mines
+
+	-2 types of control
+		-With marker: you have a marker on board which you can move with arrows, 
+				choose to flag, reveal, or mass-reveal current field
+		-With commands: you can enter commands flag, reveal and the coordinates of a field
+
+	-Menu: new game, instructions, quit; new game -> choose difficulty
+	-Additional commands during game: back to menu, toggle control mode
