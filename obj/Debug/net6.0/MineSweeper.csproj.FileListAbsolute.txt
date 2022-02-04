@@ -1,0 +1,15 @@
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\MineSweeper.exe
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\MineSweeper.deps.json
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\MineSweeper.runtimeconfig.json
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\MineSweeper.dll
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\ref\MineSweeper.dll
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\bin\Debug\net6.0\MineSweeper.pdb
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.csproj.AssemblyReference.cache
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.AssemblyInfoInputs.cache
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.AssemblyInfo.cs
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.csproj.CoreCompileInputs.cache
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.dll
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\ref\MineSweeper.dll
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.pdb
+D:\Ete cuccok\Official Stuff\Projects\MineSweeper\obj\Debug\net6.0\MineSweeper.genruntimeconfig.cache
