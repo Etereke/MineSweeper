@@ -2,24 +2,16 @@
 
 I'm basically using this readme as notes to myself and to-do list
 
-Very crude right now, still trying to get the hang of doing bigger projects
-
-Will continue next week probably
-
+Changes to previous:
+    -corrected method names to pascalcase
+    -changed field values to previously defined constants
+    -added reveal on 0, seems to be working fine
+    -added all mines revealed, seems to be working
+    -added reveal on revealed, not tested so it has a good chance of not working
 
 Things to first address:
+  -drawing; cursor, command versions: how to handle, design classes etc. Current idea: somehow separate subclasses for cursor and command versions, make board abstract maybe?
 
-  -CHANGE MAGIC NUMBERS TO MY CONST VALUES
-  
-  -implement reveal on already revealed fields - if a field is already revealed and is a number, reveal all the surrounding fields 
-    but only if you have as many flags around it as the number.
-    
-  -implement mine reveal: if a mine is revealed, reveal every single mine on the board (as it means game over anyway)
-  
-  -implement reveal 0: if a field has 0 neighbouring mines, automatically reveal surrounding fields
-  
-  -decide how to handle drawing (current is a placeholder for testing purposes): either drawing class, interface, abstract board class or something else
-  
-  -decide how to proceed - cursor, commands, handle winning/losing etc
-  
   -implement no-mine start: this comes after implementing the game itself
+      -will need a separate init method for that probably, mines only initialize after the first input from user!
+  -REVEAL ON REVEALED NEEDS TESTING, but only after game is implemented
