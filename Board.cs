@@ -1,5 +1,10 @@
 ﻿namespace MineSweeper
 {
+    // public struct Coords
+    // {
+    //     public int RowNum { get; set; } = default!;
+    //     public int ColNum { get; set; } = default!;
+    // }
     //struct for game settings - size of board and number of mines
     internal record Options
     {
@@ -22,16 +27,26 @@
     {
         protected static Random rnd = new Random();
         protected bool [,] mines;
-        protected int [,] board;
-        protected Options options;
+        protected int [,] visibleBoard;
+        protected Options settings;
         protected int numberOfUnrevealed;
         //Constants for field states
-        protected const int UNREVEALED = -1;
-        protected const int FLAGGED = -2;
-        protected const int MINE = -3;
+        public const int UNREVEALED = -1;
+        public const int FLAGGED = -2;
+        public const int MINE = -3;
+        public const int NOTFLAG = -4;
         
+        public Options GetOptions(){
+            return settings;
+        }
+        public int GetField(int row, int col){
+            return visibleBoard[row,col];
+        }
+        public int GetUnrevealed(){
+            return numberOfUnrevealed;
+        }
         public Board(){
-            options = new Options();
+            settings = new Options();
             // board = new int[options.Height,options.Width];
             // mines = new bool[options.Height,options.Width];
         }
@@ -40,9 +55,9 @@
 
         */
         protected void FillMines(){
-            int tmpMines = options.Mines;
+            int tmpMines = settings.Mines;
             while(tmpMines > 0){
-                int row = rnd.Next(0, options.Rows), col = rnd.Next(0, options.Columns);
+                int row = rnd.Next(0, settings.Rows), col = rnd.Next(0, settings.Columns);
                 if(!(mines[row, col])){
                     mines[row, col] = true;
                     tmpMines--;
@@ -50,28 +65,28 @@
             }
         }
         public void InitBoard(){
-            board = new int[options.Rows,options.Columns];
-            mines = new bool[options.Rows,options.Columns];
-            numberOfUnrevealed = options.Rows * options.Columns;
+            visibleBoard = new int[settings.Rows,settings.Columns];
+            mines = new bool[settings.Rows,settings.Columns];
+            numberOfUnrevealed = (settings.Rows * settings.Columns) - settings.Mines;
             FillMines();
-            for(int i = 0; i < options.Rows; i++){
-                for(int j = 0; j < options.Columns; j++){
-                    board[i,j] = UNREVEALED;
+            for(int i = 0; i < settings.Rows; i++){
+                for(int j = 0; j < settings.Columns; j++){
+                    visibleBoard[i,j] = UNREVEALED;
                 }
             }
         }
         //from menu, when user changes the difficulty
         public void SetOptions(int r, int c, int m){
-            options.Rows = r;
-            options.Columns = c;
-            options.Mines = m;
+            settings.Rows = r;
+            settings.Columns = c;
+            settings.Mines = m;
         }
         /*
             Helper Functions - coordinate validation
                              - counting specific field types surrounding coordinates
         */
         protected bool IsValidCoord(int row, int col){
-            return (row >= 0) && (row < options.Rows) && (col >= 0) && (col < options.Columns);
+            return (row >= 0) && (row < settings.Rows) && (col >= 0) && (col < settings.Columns);
         }
         protected int CountSurroundingMines(int row, int col){
             int count = 0;
@@ -91,7 +106,7 @@
             for(int i = row - 1; i <= row + 1; i++){
                 for(int j = col - 1; j <= col + 1; j++){
                     if(IsValidCoord(i, j)){
-                        if(board[i,j] == FLAGGED){
+                        if(visibleBoard[i,j] == FLAGGED){
                             count++;
                         }
                     }
@@ -106,31 +121,35 @@
         */
         //Basic reveal function for unrevealed fields
         protected bool RevealField(int row, int col){
-            if(board[row,col] == UNREVEALED){
+            if(visibleBoard[row,col] == UNREVEALED){
                 if(mines[row,col]){
-                    board[row,col] = MINE;
+                    visibleBoard[row,col] = MINE;
                     RevealMines();
                     return true;
                 }
-                else if ((board[row,col] = CountSurroundingMines(row, col)) == 0){
+                else if ((visibleBoard[row,col] = CountSurroundingMines(row, col)) == 0){
                     RevealSurroundings(row, col);
                 }
+                numberOfUnrevealed--;
             }
-            numberOfUnrevealed--;
             return false;
         }
 
         //Reveal function for revealed fields
-        protected void MassReveal(int row, int col){
+        protected bool MassReveal(int row, int col){
+            bool steppedOnMine = false;
             if (CountSurroundingMines(row, col) == CountSurroundingFlags(row, col)){
                 for(int i = row - 1; i <= row + 1; i++){
                     for(int j = col - 1; j <= col + 1; j++){
-                        if(IsValidCoord(i, j) && board[i,j] != FLAGGED){
-                            RevealField(i, j);
+                        if(IsValidCoord(i, j) && visibleBoard[i,j] != FLAGGED){
+                            if(RevealField(i, j)){
+                                steppedOnMine = true;
+                            };
                         }
                     }
                 }
             }
+            return steppedOnMine;
         }
 
         //For when revealed field has 0 neighbouring mines
@@ -146,10 +165,13 @@
         
         //When a mine is revealed, all mines on board become visible
         protected void RevealMines(){
-            for(int i = 0; i < options.Rows; i++){
-                for(int j = 0; j < options.Columns; j++){
-                    if(mines[i,j]){
-                        board[i,j] = MINE;
+            for(int i = 0; i < settings.Rows; i++){
+                for(int j = 0; j < settings.Columns; j++){
+                    if(mines[i,j] && visibleBoard[i,j] == UNREVEALED){
+                        visibleBoard[i,j] = MINE;
+                    }
+                    if(!mines[i,j] && visibleBoard[i,j] == FLAGGED){
+                        visibleBoard[i,j] = NOTFLAG;
                     }
                 }
             }
@@ -159,54 +181,26 @@
             public functions - they get the coordinates from the user and change the state of the board based on them
         */
         public bool Reveal(int row, int col){
-            if(board[row,col] == UNREVEALED){
+            if(visibleBoard[row,col] == UNREVEALED){
                 return RevealField(row, col);
             }
-            else if(board[row,col] > 0 && board[row,col] < 9){
-                MassReveal(row, col);
+            else if(visibleBoard[row,col] > 0 && visibleBoard[row,col] < 9){
+                return MassReveal(row, col);
             }
             return false;
         }
         public void Flag(int row, int col){
-            if(board[row,col] == UNREVEALED){
-                board[row,col] = FLAGGED;
+            if(visibleBoard[row,col] == UNREVEALED){
+                visibleBoard[row,col] = FLAGGED;
             }
-            else if(board[row,col] == FLAGGED){
-                board[row,col] = UNREVEALED;
+            else if(visibleBoard[row,col] == FLAGGED){
+                visibleBoard[row,col] = UNREVEALED;
             }
         }
         //Placeholder for testing purposes
-        public void DrawBoard(){
-            for(int i = 0; i < options.Rows; i++){
-                for( int j = 0; j < options.Columns; j++){
-                    if(board[i,j] == UNREVEALED)
-                        Console.Write("# ");
-                    else if(board[i,j] == MINE)
-                        Console.Write("* ");
-                    else if(board[i,j] == FLAGGED)
-                        Console.Write("F ");
-                    else
-                        Console.Write(board[i,j] + " ");
-                }
-                Console.WriteLine("");
-            }
-        }
+        
 
         //for testing purposes, the main function will be in a different class
-        static void Main(string[] args){
-            Console.WriteLine("Test");
-            Board board = new Board();
-            board.InitBoard();
-            // for(int i = 0; i < 9; i++){
-            //     for(int j = 0; j < 9; j++){
-            //         board.Reveal(i, j);
-            //     }
-            // }
-            board.Reveal(4, 0);
-            board.Reveal(4, 8);
-            board.Reveal(0, 4);
-            board.Reveal(8, 4);
-            board.DrawBoard();
-        }
+        
     }
 }
