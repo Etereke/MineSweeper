@@ -1,17 +1,12 @@
 ﻿namespace MineSweeper
 {
-    // public struct Coords
-    // {
-    //     public int RowNum { get; set; } = default!;
-    //     public int ColNum { get; set; } = default!;
-    // }
     //struct for game settings - size of board and number of mines
-    internal record Options
+    public record Options
     {
         public Options(){
-            Rows = 9;
-            Columns = 9;
-            Mines = 10;
+            Rows = 16;
+            Columns = 16;
+            Mines = 40;
         }
         public Options(int rows, int cols, int mines){
             Rows = rows;
@@ -51,14 +46,17 @@
             // mines = new bool[options.Height,options.Width];
         }
         /*
-            Initializing functions - should be called at the start of the game
-
+            Initializing functions
+                InitBoard only initializes the visible board, not the minefield itself.
+                FillMines initializes the minefield itself. It takes two integers that 
+                    indicate the position of the first field unrevealed, in order to 
+                        avoid the player dying on their first pick
         */
-        protected void FillMines(){
+        public void FillMines(int startingRow, int startingCol){
             int tmpMines = settings.Mines;
             while(tmpMines > 0){
                 int row = rnd.Next(0, settings.Rows), col = rnd.Next(0, settings.Columns);
-                if(!(mines[row, col])){
+                if(!(mines[row, col]) && !(row == startingRow && col == startingCol)){
                     mines[row, col] = true;
                     tmpMines--;
                 }
@@ -68,7 +66,6 @@
             visibleBoard = new int[settings.Rows,settings.Columns];
             mines = new bool[settings.Rows,settings.Columns];
             numberOfUnrevealed = (settings.Rows * settings.Columns) - settings.Mines;
-            FillMines();
             for(int i = 0; i < settings.Rows; i++){
                 for(int j = 0; j < settings.Columns; j++){
                     visibleBoard[i,j] = UNREVEALED;

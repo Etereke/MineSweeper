@@ -1,10 +1,9 @@
 namespace MineSweeper
 {
-
     public interface IMineSweeper
     {
         public void DrawBoard();
-        public void Game();
+        public void SingleRound();
         
     }
 }

@@ -8,23 +8,69 @@ namespace MineSweeper
             public int Col { get; set; } = default!;
         }
         protected Board board = new Board();
-        public void DrawBoard(){
-            for(int i = 0; i < board.GetOptions().Rows; i++){
-                for( int j = 0; j < board.GetOptions().Columns; j++){
-                    if(board.GetField(i, j) == Board.UNREVEALED)
-                        Console.Write("# ");
-                    else if(board.GetField(i, j) == Board.MINE)
-                        Console.Write("* ");
-                    else if(board.GetField(i, j) == Board.FLAGGED)
-                        Console.Write("F ");
-                    else if(board.GetField(i, j) == Board.NOTFLAG)
-                        Console.Write("X ");
+        
+        /*
+            Draw function + helper methods
+        */
+        private void DrawHeader(){
+            Console.Write("   ");
+            for(int i = 0; i < board.GetOptions().Columns; i++){
+                if(i < 9){
+                    Console.Write("{0} |", i + 1);
+                }
+                else{
+                    Console.Write("{0}|", i + 1);
+                }
+            }
+            Console.WriteLine("");
+        }
+        private void DrawSeparator(){
+            for(int j = 0; j < board.GetOptions().Columns + 1; j++){
+                    Console.Write("---");
+                }
+                Console.WriteLine("");
+        }
+        private void DrawRightSide(int num){
+            if(num < 9){
+                    Console.Write("{0} |", num + 1);
+                }
+                else{
+                    Console.Write("{0}|", num + 1);
+                }
+        }
+        private void DrawField(int row, int col){
+            if(board.GetField(row, col) == Board.UNREVEALED)
+                        Console.Write("  |");
+                    else if(board.GetField(row, col) == Board.MINE)
+                        Console.Write("**|");
+                    else if(board.GetField(row, col) == Board.FLAGGED)
+                        Console.Write("@@|");
+                    else if(board.GetField(row, col) == Board.NOTFLAG)
+                        Console.Write("XX|");
                     else
-                        Console.Write(board.GetField(i, j) + " ");
+                        Console.Write("{0}{0}|", board.GetField(row, col));
+        }
+        public void DrawBoard(){
+            DrawHeader();
+            for(int i = 0; i < board.GetOptions().Rows; i++){
+                DrawSeparator();
+                DrawRightSide(i);
+                for(int j = 0; j < board.GetOptions().Columns; j++){
+                    DrawField(i, j);
                 }
                 Console.WriteLine("");
             }
         }
+
+    /*
+        Reads command until a right command is entered
+        Valid commands look like this: 
+            "command i j"
+        Where
+            -> command: "reveal" or "r" or "flag" or "f" (not case sensitive)
+            -> i: number from 1 to number of rows (so you select which row you target)
+            -> j: number from 1 to number of columns (so you select which column you target)
+    */
         protected Command GetCommand(){
             Command command = new Command();
             bool validCommand = false;
@@ -56,8 +102,10 @@ namespace MineSweeper
             } while(!validCommand);
             return command;
         }
-        protected bool ExecuteCommand(){
-            Command command = GetCommand();
+        /*
+            Functions responsible for running the game itself
+        */
+        protected bool ExecuteCommand(Command command){
             if(command.Reveal){
                 return board.Reveal(command.Row, command.Col);
             }
@@ -66,12 +114,18 @@ namespace MineSweeper
             }
             return false;
         }
-        public void Game(){
+        public void SingleRound(){
+
             board.InitBoard();
+            DrawBoard();
+            Command cmd = GetCommand();
+            board.FillMines(cmd.Row, cmd.Col);
+            ExecuteCommand(cmd);
+
             bool steppedOnMine = false;
             do{
                 DrawBoard();
-                steppedOnMine = ExecuteCommand();
+                steppedOnMine = ExecuteCommand(GetCommand());
             } while(!steppedOnMine && board.GetUnrevealed() > 0);
             DrawBoard();
             if(steppedOnMine) {
@@ -85,7 +139,8 @@ namespace MineSweeper
         static void Main(string[] args){
             Console.WriteLine("Test");
             IMineSweeper mineSweeper = new CommandMineSweeper();
-            mineSweeper.Game();
+            mineSweeper.SingleRound();
+            Console.ReadKey();
         }
     }
 }
